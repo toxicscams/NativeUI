@@ -13,12 +13,41 @@ namespace NativeUI
         public event ItemCheckboxEvent CheckboxEvent;
 
         /// <summary>
+        /// Automaticly Changes Value With Reference.
+        /// </summary>
+        public ReferenceContainer<bool> CheckedReference;
+
+        /// <summary>
         /// Checkbox item with a toggleable checkbox.
         /// </summary>
         /// <param name="text">Item label.</param>
         /// <param name="check">Boolean value whether the checkbox is checked.</param>
         public UIMenuCheckboxItem(string text, bool check) : this(text, check, "")
         {
+        }
+
+        /// <summary>
+        /// Checkbox item with a toggleable checkbox, Updates With Reference Change.
+        /// </summary>
+        /// <param name="text">Item label.</param>
+        /// <param name="check">Boolean value whether the checkbox is checked.</param>
+        public UIMenuCheckboxItem(string text, ref ReferenceContainer<bool> check) : this(text, ref check, "")
+        {
+
+        }
+
+        /// <summary>
+        /// Checkbox item with a toggleable checkbox, Updates With Reference Change.
+        /// </summary>
+        /// <param name="text">Item label.</param>
+        /// <param name="check">Boolean value whether the checkbox is checked.</param>
+        /// <param name="description">Description for this item.</param>
+        public UIMenuCheckboxItem(string text, ref ReferenceContainer<bool> check, string description) : base(text, description)
+        {
+            const int y = 0;
+            _checkedSprite = new Sprite("commonmenu", "shop_box_blank", new Point(410, y + 95), new Size(50, 50));
+            Checked = check.Value;
+            CheckedReference = new ReferenceContainer<bool>(Checked);
         }
 
         /// <summary>
@@ -59,6 +88,7 @@ namespace NativeUI
         {
             base.Draw();
             _checkedSprite.Position = new Point(380 + Offset.X + Parent.WidthOffset, _checkedSprite.Position.Y);
+            Checked = CheckedReference.Value;
             if (Selected)
             {
                 _checkedSprite.TextureName = Checked ? "shop_box_tickb" : "shop_box_blankb";
@@ -73,6 +103,7 @@ namespace NativeUI
         public void CheckboxEventTrigger()
         {
             CheckboxEvent?.Invoke(this, Checked);
+            CheckedReference.Value = Checked;
         }
 
         public override void SetRightBadge(BadgeStyle badge)
